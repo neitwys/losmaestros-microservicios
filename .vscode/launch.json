@@ -1,0 +1,14 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot-ContactoApplication<contacto>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "cl.losmaestros.contacto.ContactoApplication",
+      "projectName": "contacto",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
