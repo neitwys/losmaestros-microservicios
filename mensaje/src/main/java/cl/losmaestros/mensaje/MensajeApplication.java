@@ -1,13 +1,13 @@
-package cl.losmaestros.contacto;
+package cl.losmaestros.mensaje;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ContactoApplication {
+public class MensajeApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ContactoApplication.class, args);
+		SpringApplication.run(MensajeApplication.class, args);
 	}
 
 }

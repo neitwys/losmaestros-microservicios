@@ -1,10 +1,10 @@
-package cl.losmaestros.contacto;
+package cl.losmaestros.mensaje;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ContactoApplicationTests {
+class MensajeApplicationTests {
 
 	@Test
 	void contextLoads() {
