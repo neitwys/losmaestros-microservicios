@@ -39,6 +39,16 @@
       "projectName": "mensaje",
       "args": "",
       "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot-CatalogoApplication<catalogo>",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "cl.losmaestros.catalogo.CatalogoApplication",
+      "projectName": "catalogo",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env"
     }
   ]
 }
