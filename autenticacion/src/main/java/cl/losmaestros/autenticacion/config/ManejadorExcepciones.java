@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import cl.losmaestros.autenticacion.exception.ConflictoException;
 import cl.losmaestros.autenticacion.exception.CredencialesInvalidasException;
 import cl.losmaestros.autenticacion.exception.RecursoNoEncontradoException;
+import cl.losmaestros.autenticacion.exception.TokenInvalidoException;
 
 @RestControllerAdvice
 public class ManejadorExcepciones {
@@ -28,6 +29,11 @@ public class ManejadorExcepciones {
 
     @ExceptionHandler(CredencialesInvalidasException.class)
     public ResponseEntity<Map<String, Object>> manejarCredenciales(CredencialesInvalidasException e) {
+        return construirRespuesta(HttpStatus.UNAUTHORIZED, e.getMessage(), null);
+    }
+
+    @ExceptionHandler(TokenInvalidoException.class)
+    public ResponseEntity<Map<String, Object>> manejarTokenInvalido(TokenInvalidoException e) {
         return construirRespuesta(HttpStatus.UNAUTHORIZED, e.getMessage(), null);
     }
 

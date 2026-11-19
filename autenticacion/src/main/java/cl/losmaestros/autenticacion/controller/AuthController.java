@@ -2,12 +2,15 @@ package cl.losmaestros.autenticacion.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cl.losmaestros.autenticacion.model.LoginDTO;
+import cl.losmaestros.autenticacion.model.LoginRespuestaDTO;
 import cl.losmaestros.autenticacion.model.UsuarioMostrarDTO;
 import cl.losmaestros.autenticacion.model.UsuarioRegistroDTO;
 import cl.losmaestros.autenticacion.service.UsuarioService;
@@ -48,7 +51,19 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     @PostMapping("/login")
-    public ResponseEntity<UsuarioMostrarDTO> login(@Valid @RequestBody LoginDTO dto) {
+    public ResponseEntity<LoginRespuestaDTO> login(@Valid @RequestBody LoginDTO dto) {
         return ResponseEntity.ok(service.iniciarSesion(dto));
+    }
+
+    @Operation(summary = "Obtener el perfil del usuario autenticado", description = "Devuelve los datos del usuario dueño del token enviado en el encabezado Authorization: Bearer.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Perfil obtenido exitosamente"),
+            @ApiResponse(responseCode = "401", description = "Token ausente, inválido o expirado"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    @GetMapping("/me")
+    public ResponseEntity<UsuarioMostrarDTO> miPerfil(
+            @RequestHeader(value = "Authorization", required = false) String autorizacion) {
+        return ResponseEntity.ok(service.obtenerPerfil(autorizacion));
     }
 }

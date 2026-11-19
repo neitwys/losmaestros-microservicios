@@ -3,12 +3,15 @@ package cl.losmaestros.autenticacion.service;
 import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
+import io.jsonwebtoken.Claims;
 import org.springframework.stereotype.Service;
 
 import cl.losmaestros.autenticacion.exception.ConflictoException;
 import cl.losmaestros.autenticacion.exception.CredencialesInvalidasException;
 import cl.losmaestros.autenticacion.exception.RecursoNoEncontradoException;
+import cl.losmaestros.autenticacion.exception.TokenInvalidoException;
 import cl.losmaestros.autenticacion.model.LoginDTO;
+import cl.losmaestros.autenticacion.model.LoginRespuestaDTO;
 import cl.losmaestros.autenticacion.model.Usuario;
 import cl.losmaestros.autenticacion.model.UsuarioActualizarDTO;
 import cl.losmaestros.autenticacion.model.UsuarioMostrarDTO;
@@ -21,9 +24,12 @@ public class UsuarioService {
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder) {
+    private final JwtService jwtService;
+
+    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     // REGISTRO (siempre crea un CLIENTE)
@@ -54,7 +60,7 @@ public class UsuarioService {
     }
 
     // LOGIN
-    public UsuarioMostrarDTO iniciarSesion(LoginDTO dto) {
+    public LoginRespuestaDTO iniciarSesion(LoginDTO dto) {
         String correo = normalizarCorreo(dto.getCorreo());
 
         Usuario usuario = repository.findByCorreo(correo)
@@ -65,7 +71,18 @@ public class UsuarioService {
             throw new CredencialesInvalidasException("Correo o contraseña incorrectos");
         }
 
-        return convertirADTO(usuario);
+        LoginRespuestaDTO respuesta = new LoginRespuestaDTO();
+        respuesta.setToken(jwtService.generarToken(usuario));
+        respuesta.setUsuario(convertirADTO(usuario));
+        return respuesta;
+    }
+
+    public UsuarioMostrarDTO obtenerPerfil(String autorizacion) {
+        if (autorizacion == null || !autorizacion.startsWith("Bearer ")) {
+            throw new TokenInvalidoException("Falta el token de autenticación");
+        }
+        Claims claims = jwtService.validar(autorizacion.substring(7));
+        return obtenerUsuarioPorCorreo(claims.getSubject());
     }
 
     // READ
