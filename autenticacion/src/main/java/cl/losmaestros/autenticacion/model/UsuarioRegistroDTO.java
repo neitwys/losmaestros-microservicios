@@ -1,5 +1,6 @@
 package cl.losmaestros.autenticacion.model;
 
+import cl.losmaestros.autenticacion.validacion.RunValido;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -11,7 +12,10 @@ public class UsuarioRegistroDTO {
     @Size(max = 100, message = "El nombre no puede tener más de 100 caracteres")
     private String nombre;
 
-    @NotBlank(message = "El apellido es obligatorio")
+    @NotBlank(message = "El RUN es obligatorio")
+    @RunValido
+    private String run;
+
     @Size(max = 100, message = "El apellido no puede tener más de 100 caracteres")
     private String apellido;
 
@@ -24,6 +28,7 @@ public class UsuarioRegistroDTO {
     @Size(min = 6, max = 50, message = "La contraseña debe tener entre 6 y 50 caracteres")
     private String contrasena;
 
+    @NotBlank(message = "El teléfono es obligatorio")
     @Size(max = 20, message = "El teléfono no puede tener más de 20 caracteres")
     private String telefono;
 }

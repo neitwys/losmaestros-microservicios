@@ -25,7 +25,10 @@ public class Usuario {
     @Column(nullable = false, length = 100)
     private String nombre;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = false, length = 12, unique = true)
+    private String run;
+
+    @Column(nullable = true, length = 100)
     private String apellido;
 
     @Column(nullable = false, length = 255, unique = true)
@@ -34,7 +37,7 @@ public class Usuario {
     @Column(nullable = false, length = 100)
     private String contrasena;
 
-    @Column(nullable = true, length = 20)
+    @Column(nullable = false, length = 20)
     private String telefono;
 
     @Column(nullable = false, length = 20)

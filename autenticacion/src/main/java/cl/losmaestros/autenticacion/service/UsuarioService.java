@@ -14,6 +14,7 @@ import cl.losmaestros.autenticacion.model.UsuarioActualizarDTO;
 import cl.losmaestros.autenticacion.model.UsuarioMostrarDTO;
 import cl.losmaestros.autenticacion.model.UsuarioRegistroDTO;
 import cl.losmaestros.autenticacion.repository.UsuarioRepository;
+import cl.losmaestros.autenticacion.validacion.RunValidador;
 
 @Service
 public class UsuarioService {
@@ -33,9 +34,16 @@ public class UsuarioService {
             throw new ConflictoException("Ya existe un usuario registrado con el correo: " + correo);
         }
 
+        String run = RunValidador.normalizar(dto.getRun());
+
+        if (repository.existsByRun(run)) {
+            throw new ConflictoException("Ya existe un usuario registrado con el RUN: " + run);
+        }
+
         Usuario usuario = new Usuario();
         usuario.setNombre(dto.getNombre().trim());
-        usuario.setApellido(dto.getApellido().trim());
+        usuario.setRun(run);
+        usuario.setApellido(limpiarApellido(dto.getApellido()));
         usuario.setCorreo(correo);
         usuario.setContrasena(passwordEncoder.encode(dto.getContrasena()));
         usuario.setTelefono(dto.getTelefono());
@@ -80,7 +88,7 @@ public class UsuarioService {
     public UsuarioMostrarDTO actualizarUsuario(Long id, UsuarioActualizarDTO dto) {
         Usuario usuario = buscarPorId(id);
         usuario.setNombre(dto.getNombre().trim());
-        usuario.setApellido(dto.getApellido().trim());
+        usuario.setApellido(limpiarApellido(dto.getApellido()));
         usuario.setTelefono(dto.getTelefono());
         return convertirADTO(repository.save(usuario));
     }
@@ -103,10 +111,15 @@ public class UsuarioService {
         return correo.trim().toLowerCase();
     }
 
+    private String limpiarApellido(String apellido) {
+        return apellido == null || apellido.isBlank() ? null : apellido.trim();
+    }
+
     private UsuarioMostrarDTO convertirADTO(Usuario u) {
         UsuarioMostrarDTO dto = new UsuarioMostrarDTO();
         dto.setId(u.getId());
         dto.setNombre(u.getNombre());
+        dto.setRun(u.getRun());
         dto.setApellido(u.getApellido());
         dto.setCorreo(u.getCorreo());
         dto.setTelefono(u.getTelefono());
