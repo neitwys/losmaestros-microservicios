@@ -81,7 +81,7 @@ public class MensajeController {
             @ApiResponse(responseCode = "404", description = "Mensaje no encontrado"),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
-    @GetMapping("/buscar/{correo}")
+    @GetMapping("/buscar/correo/{correo}")
     public ResponseEntity<MensajeMostrarDTO> buscarMensajePorCorreo(@PathVariable String correo) {
         try {
             MensajeMostrarDTO mensajeDTO = service.obtenerMensajePorCorreo(correo);
