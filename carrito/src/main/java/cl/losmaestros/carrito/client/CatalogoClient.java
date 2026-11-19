@@ -2,6 +2,7 @@ package cl.losmaestros.carrito.client;
 
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -15,7 +16,7 @@ import cl.losmaestros.carrito.model.ProductoExternoDTO;
 public class CatalogoClient {
     private final RestClient restClient;
 
-    public CatalogoClient(RestClient.Builder builder, @Value("${servicios.catalogo.url}") String url) {
+    public CatalogoClient(@Qualifier("balanceado") RestClient.Builder builder, @Value("${servicios.catalogo.url}") String url) {
         this.restClient = builder.baseUrl(url).build();
     }
 
