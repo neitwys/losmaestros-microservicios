@@ -2,14 +2,11 @@ package cl.losmaestros.autenticacion.service;
 
 import java.util.List;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
-import io.jsonwebtoken.Claims;
-import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;import org.springframework.stereotype.Service;
 
 import cl.losmaestros.autenticacion.exception.ConflictoException;
 import cl.losmaestros.autenticacion.exception.CredencialesInvalidasException;
 import cl.losmaestros.autenticacion.exception.RecursoNoEncontradoException;
-import cl.losmaestros.autenticacion.exception.TokenInvalidoException;
 import cl.losmaestros.autenticacion.model.LoginDTO;
 import cl.losmaestros.autenticacion.model.LoginRespuestaDTO;
 import cl.losmaestros.autenticacion.model.Usuario;
@@ -75,14 +72,6 @@ public class UsuarioService {
         respuesta.setToken(jwtService.generarToken(usuario));
         respuesta.setUsuario(convertirADTO(usuario));
         return respuesta;
-    }
-
-    public UsuarioMostrarDTO obtenerPerfil(String autorizacion) {
-        if (autorizacion == null || !autorizacion.startsWith("Bearer ")) {
-            throw new TokenInvalidoException("Falta el token de autenticación");
-        }
-        Claims claims = jwtService.validar(autorizacion.substring(7));
-        return obtenerUsuarioPorCorreo(claims.getSubject());
     }
 
     // READ

@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import cl.losmaestros.autenticacion.exception.AccesoDenegadoException;
 import cl.losmaestros.autenticacion.exception.ConflictoException;
 import cl.losmaestros.autenticacion.exception.CredencialesInvalidasException;
 import cl.losmaestros.autenticacion.exception.RecursoNoEncontradoException;
@@ -30,6 +31,11 @@ public class ManejadorExcepciones {
     @ExceptionHandler(CredencialesInvalidasException.class)
     public ResponseEntity<Map<String, Object>> manejarCredenciales(CredencialesInvalidasException e) {
         return construirRespuesta(HttpStatus.UNAUTHORIZED, e.getMessage(), null);
+    }
+
+    @ExceptionHandler(AccesoDenegadoException.class)
+    public ResponseEntity<Map<String, Object>> manejarAccesoDenegado(AccesoDenegadoException e) {
+        return construirRespuesta(HttpStatus.FORBIDDEN, e.getMessage(), null);
     }
 
     @ExceptionHandler(TokenInvalidoException.class)
