@@ -16,6 +16,7 @@ spring:
                 - Path=/autenticacion/**
               filters:
                 - StripPrefix=1
+                - RemoveRequestHeader=Origin
 
             - id: ruta-carrito
               uri: lb://CARRITO
@@ -23,6 +24,7 @@ spring:
                 - Path=/carrito/**
               filters:
                 - StripPrefix=1
+                - RemoveRequestHeader=Origin
 
             - id: ruta-catalogo
               uri: lb://CATALOGO
@@ -30,6 +32,7 @@ spring:
                 - Path=/catalogo/**
               filters:
                 - StripPrefix=1
+                - RemoveRequestHeader=Origin
 
             - id: ruta-mensaje
               uri: lb://MENSAJE
@@ -37,6 +40,7 @@ spring:
                 - Path=/mensaje/**
               filters:
                 - StripPrefix=1
+                - RemoveRequestHeader=Origin
 
 eureka:
   client:
