@@ -179,5 +179,12 @@ services:
       retries: 40
       start_period: 20s
 
+  web:
+    build:
+      context: ${WEB_PATH:-../web-los-maestros}
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+
 volumes:
   db:

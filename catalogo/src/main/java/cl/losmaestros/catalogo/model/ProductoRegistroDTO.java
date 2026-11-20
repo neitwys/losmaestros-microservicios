@@ -12,6 +12,18 @@ import lombok.Data;
 
 @Data
 public class ProductoRegistroDTO {
+    @NotBlank(message = "El código es obligatorio")
+    @Size(max = 20, message = "El código no puede tener más de 20 caracteres")
+    private String codigo;
+
+    @NotBlank(message = "La marca es obligatoria")
+    @Size(max = 100, message = "La marca no puede tener más de 100 caracteres")
+    private String marca;
+
+    @NotBlank(message = "La unidad es obligatoria")
+    @Size(max = 30, message = "La unidad no puede tener más de 30 caracteres")
+    private String unidad;
+
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 150, message = "El nombre no puede tener más de 150 caracteres")
     private String nombre;

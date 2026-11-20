@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import cl.losmaestros.catalogo.exception.ConflictoException;
 import cl.losmaestros.catalogo.exception.RecursoNoEncontradoException;
 import cl.losmaestros.catalogo.model.Categoria;
 import cl.losmaestros.catalogo.model.Producto;
@@ -26,6 +27,9 @@ public class ProductoService {
     // CREATE
     @Transactional
     public ProductoMostrarDTO guardarProducto(ProductoRegistroDTO dto) {
+        if (repository.existsByCodigo(dto.getCodigo())) {
+            throw new ConflictoException("Ya existe un producto con el código: " + dto.getCodigo());
+        }
         Producto producto = new Producto();
         copiarDatos(producto, dto);
         return convertirADTO(repository.save(producto));
@@ -56,6 +60,9 @@ public class ProductoService {
     @Transactional
     public ProductoMostrarDTO actualizarProducto(Long id, ProductoRegistroDTO dto) {
         Producto producto = buscarPorId(id);
+        if (repository.existsByCodigoAndIdNot(dto.getCodigo(), id)) {
+            throw new ConflictoException("Ya existe un producto con el código: " + dto.getCodigo());
+        }
         copiarDatos(producto, dto);
         return convertirADTO(repository.save(producto));
     }
@@ -79,7 +86,10 @@ public class ProductoService {
                 .orElseThrow(() -> new RecursoNoEncontradoException(
                         "Categoría no encontrada con ID: " + dto.getCategoriaId()));
 
+        producto.setCodigo(dto.getCodigo());
         producto.setNombre(dto.getNombre());
+        producto.setMarca(dto.getMarca());
+        producto.setUnidad(dto.getUnidad());
         producto.setDescripcion(dto.getDescripcion());
         producto.setPrecio(dto.getPrecio());
         producto.setStock(dto.getStock());
@@ -91,7 +101,10 @@ public class ProductoService {
     private ProductoMostrarDTO convertirADTO(Producto p) {
         ProductoMostrarDTO dto = new ProductoMostrarDTO();
         dto.setId(p.getId());
+        dto.setCodigo(p.getCodigo());
         dto.setNombre(p.getNombre());
+        dto.setMarca(p.getMarca());
+        dto.setUnidad(p.getUnidad());
         dto.setDescripcion(p.getDescripcion());
         dto.setPrecio(p.getPrecio());
         dto.setStock(p.getStock());

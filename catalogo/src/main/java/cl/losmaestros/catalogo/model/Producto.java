@@ -23,8 +23,17 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 20, unique = true)
+    private String codigo;
+
     @Column(nullable = false, length = 150)
     private String nombre;
+
+    @Column(nullable = false, length = 100)
+    private String marca;
+
+    @Column(nullable = false, length = 30)
+    private String unidad;
 
     @Column(nullable = true, columnDefinition = "TEXT")
     private String descripcion;
