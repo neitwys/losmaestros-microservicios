@@ -10,9 +10,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import cl.losmaestros.carrito.exception.AccesoDenegadoException;
 import cl.losmaestros.carrito.exception.ConflictoException;
 import cl.losmaestros.carrito.exception.RecursoNoEncontradoException;
 import cl.losmaestros.carrito.exception.ServicioNoDisponibleException;
+import cl.losmaestros.carrito.exception.TokenInvalidoException;
 
 @RestControllerAdvice
 public class ManejadorExcepciones {
@@ -20,6 +22,16 @@ public class ManejadorExcepciones {
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity<Map<String, Object>> manejarNoEncontrado(RecursoNoEncontradoException e) {
         return construirRespuesta(HttpStatus.NOT_FOUND, e.getMessage(), null);
+    }
+
+    @ExceptionHandler(TokenInvalidoException.class)
+    public ResponseEntity<Map<String, Object>> manejarTokenInvalido(TokenInvalidoException e) {
+        return construirRespuesta(HttpStatus.UNAUTHORIZED, e.getMessage(), null);
+    }
+
+    @ExceptionHandler(AccesoDenegadoException.class)
+    public ResponseEntity<Map<String, Object>> manejarAccesoDenegado(AccesoDenegadoException e) {
+        return construirRespuesta(HttpStatus.FORBIDDEN, e.getMessage(), null);
     }
 
     @ExceptionHandler(ConflictoException.class)

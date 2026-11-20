@@ -1,4 +1,11 @@
+x-entorno-comun: &entorno-comun
+  JWT_SECRET: ${JWT_SECRET:-losmaestros_examen_clave_2026_segura}
+  EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+  EUREKA_INSTANCE_PREFER_IP_ADDRESS: "false"
+  EUREKA_CLIENT_REGISTRY_FETCH_INTERVAL_SECONDS: "5"
+
 services:
+
   db-losmaestros:
     image: mysql:8.0
     container_name: db-losmaestros
@@ -10,6 +17,167 @@ services:
     volumes:
       - db:/var/lib/mysql
       - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  eureka-server:
+    build:
+      context: .
+      args:
+        SERVICIO: eureka-server
+    restart: unless-stopped
+    ports:
+      - "8761:8761"
+    environment:
+      <<: *entorno-comun
+      EUREKA_SERVER_RESPONSE_CACHE_UPDATE_INTERVAL_MS: "3000"
+      EUREKA_SERVER_USE_READ_ONLY_RESPONSE_CACHE: "false"
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8761' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
+  autenticacion:
+    build:
+      context: .
+      args:
+        SERVICIO: autenticacion
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      <<: *entorno-comun
+      EUREKA_INSTANCE_HOSTNAME: autenticacion
+      EUREKA_INSTANCE_INSTANCE_ID: autenticacion:8081
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-losmaestros:3306/autenticacion
+    depends_on:
+      db-losmaestros:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8081' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
+  catalogo:
+    build:
+      context: .
+      args:
+        SERVICIO: catalogo
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      <<: *entorno-comun
+      EUREKA_INSTANCE_HOSTNAME: catalogo
+      EUREKA_INSTANCE_INSTANCE_ID: catalogo:8083
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-losmaestros:3306/catalogo
+    depends_on:
+      db-losmaestros:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8083' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
+  carrito:
+    build:
+      context: .
+      args:
+        SERVICIO: carrito
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      <<: *entorno-comun
+      EUREKA_INSTANCE_HOSTNAME: carrito
+      EUREKA_INSTANCE_INSTANCE_ID: carrito:8082
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-losmaestros:3306/carrito
+      SERVICIOS_CATALOGO_URL: http://catalogo
+      SERVICIOS_AUTENTICACION_URL: http://autenticacion
+    depends_on:
+      db-losmaestros:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      autenticacion:
+        condition: service_healthy
+      catalogo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8082' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
+  mensaje:
+    build:
+      context: .
+      args:
+        SERVICIO: mensaje
+    restart: unless-stopped
+    ports:
+      - "8084:8084"
+    environment:
+      <<: *entorno-comun
+      EUREKA_INSTANCE_HOSTNAME: mensaje
+      EUREKA_INSTANCE_INSTANCE_ID: mensaje:8084
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-losmaestros:3306/mensaje
+    depends_on:
+      db-losmaestros:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8084' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
+
+  api-gateway:
+    build:
+      context: .
+      args:
+        SERVICIO: api-gateway
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    environment:
+      <<: *entorno-comun
+      EUREKA_INSTANCE_HOSTNAME: api-gateway
+      EUREKA_INSTANCE_INSTANCE_ID: api-gateway:8090
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      autenticacion:
+        condition: service_healthy
+      catalogo:
+        condition: service_healthy
+      carrito:
+        condition: service_healthy
+      mensaje:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/127.0.0.1/8090' || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 40
+      start_period: 20s
 
 volumes:
   db:

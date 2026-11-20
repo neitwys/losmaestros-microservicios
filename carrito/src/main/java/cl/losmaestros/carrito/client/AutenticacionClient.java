@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import cl.losmaestros.carrito.exception.ServicioNoDisponibleException;
 import cl.losmaestros.carrito.model.UsuarioExternoDTO;
@@ -24,6 +26,7 @@ public class AutenticacionClient {
         try {
             return Optional.ofNullable(restClient.get()
                     .uri("/usuarios/buscar/{id}", usuarioId)
+                    .header("Authorization", tokenDeLaPeticion())
                     .retrieve()
                     .body(UsuarioExternoDTO.class));
         } catch (HttpClientErrorException.NotFound e) {
@@ -31,5 +34,10 @@ public class AutenticacionClient {
         } catch (RestClientException e) {
             throw new ServicioNoDisponibleException("El servicio de autenticación no está disponible");
         }
+    }
+
+    private String tokenDeLaPeticion() {
+        ServletRequestAttributes atributos = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        return atributos.getRequest().getHeader("Authorization");
     }
 }
